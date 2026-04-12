@@ -2,7 +2,7 @@
 
 Aplicación simple para registrar, almacenar y listar clientes.
 
-Campos: Nombre, RUT/ID, Correo, Teléfono. ( lo q tienes q agregar y cualquiera cosa me hablas)
+Campos: Nombre, RUT/ID, Correo, Teléfono. 
 
 Tecnología:
 - Interfaz: Streamlit (Python)
