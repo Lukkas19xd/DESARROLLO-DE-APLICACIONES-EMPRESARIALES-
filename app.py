@@ -274,7 +274,6 @@ def registro_clientes():
     st.markdown("### Ingrese la información del nuevo contacto")
     
     with st.container():
-        st.markdown('<div class="main-card">', unsafe_allow_html=True)
         with st.form("form_nuevo", clear_on_submit=True):
             col1, col2 = st.columns(2)
             with col1:
