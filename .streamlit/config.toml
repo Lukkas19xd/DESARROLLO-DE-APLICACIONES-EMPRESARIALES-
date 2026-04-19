@@ -1,0 +1,10 @@
+[server]
+headless = true
+enableCookieStorage = true
+
+[browser]
+serverAddress = "localhost"
+gatherUsageStats = false
+
+[runner]
+magicEnabled = true
