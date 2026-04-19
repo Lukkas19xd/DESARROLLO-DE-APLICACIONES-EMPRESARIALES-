@@ -27,17 +27,55 @@ def login():
             if username in CREDENTIALS and CREDENTIALS[username]["password"] == password:
                 st.session_state.logged_in = True
                 st.session_state.username = username
-                st.session_state.role = CREDENTIALS[username]["role"] 
+                st.session_state.role = CREDENTIALS[username]["role"]
+                # Guardar sesión en archivo
+                save_session(True, username, CREDENTIALS[username]["role"])
                 st.success("Acceso concedido!")
                 st.rerun()
             else:
                 st.error("Credenciales incorrectas.")
     st.markdown('</div>', unsafe_allow_html=True)
 
-# --- VERIFICAR AUTENTICACIÓN ---
-if "logged_in" not in st.session_state:
-    st.session_state.logged_in = False
+# --- INICIALIZAR ESTADO DE SESIÓN CON ARCHIVO ---
+import os
 
+SESSION_FILE = "session_state.txt"
+
+def load_session():
+    """Cargar sesión desde archivo"""
+    if os.path.exists(SESSION_FILE):
+        try:
+            with open(SESSION_FILE, 'r') as f:
+                lines = f.read().splitlines()
+                if len(lines) >= 3:
+                    return {
+                        'logged_in': lines[0] == 'True',
+                        'username': lines[1],
+                        'role': lines[2]
+                    }
+        except:
+            pass
+    return {'logged_in': False, 'username': '', 'role': ''}
+
+def save_session(logged_in, username, role):
+    """Guardar sesión en archivo"""
+    with open(SESSION_FILE, 'w') as f:
+        f.write(f"{logged_in}\n{username}\n{role}")
+
+# Cargar sesión al inicio
+saved_session = load_session()
+if "logged_in" not in st.session_state:
+    st.session_state.logged_in = saved_session['logged_in']
+if "username" not in st.session_state:
+    st.session_state.username = saved_session['username']
+if "role" not in st.session_state:
+    st.session_state.role = saved_session['role']
+
+# Guardar sesión cuando cambie
+if st.session_state.logged_in:
+    save_session(True, st.session_state.username, st.session_state.role)
+
+# --- VERIFICAR AUTENTICACIÓN ---
 if not st.session_state.logged_in:
     login()
     st.stop()
@@ -265,6 +303,9 @@ with st.sidebar:
     st.write(f"**Fecha:** {datetime.now().strftime('%d/%m/%Y')}")
     st.divider()
     if st.button("Cerrar Sesión"):
+        # Eliminar archivo de sesión
+        if os.path.exists(SESSION_FILE):
+            os.remove(SESSION_FILE)
         st.session_state.logged_in = False
         st.rerun()
 
