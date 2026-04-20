@@ -15,7 +15,7 @@ CREDENTIALS = {
 
 # --- AUTENTICACIÓN ---
 def login():
-    st.title("Acceso al Sistema")
+    st.title("Acceso al Sistema de Gestión de Clientes")
     st.markdown('<div class="main-card">', unsafe_allow_html=True)
     
     with st.form("login_form"):
@@ -80,7 +80,7 @@ if not st.session_state.logged_in:
     login()
     st.stop()
 
-# --- DISEÑO CSS PERSONALIZADO DARK MODE AVANZADO ---
+# --- DISEÑO CSS ---
 st.markdown("""
     <style>
     /* Fondo general con gradiente animado */
@@ -331,15 +331,21 @@ def registro_clientes():
                 if not nombre or not rut:
                     st.warning("Los campos Nombre y RUT son obligatorios.")
                 else:
-                    try:
-                        cur = conn.cursor()
-                        cur.execute("INSERT INTO clientes (nombre, rut, correo, telefono) VALUES (?, ?, ?, ?)",
-                                   (nombre.strip(), rut.strip(), correo.strip(), telefono.strip()))
-                        conn.commit()
-                        st.success(f"¡Excelente! {nombre} ha sido registrado.")
-                        st.balloons()
-                    except sqlite3.IntegrityError:
-                        st.error("Error: Este RUT ya existe en el sistema.")
+                    # Validación simple: correo opcional pero si se entrega debe contener '@' y '.'
+                    if correo and ('@' not in correo or '.' not in correo):
+                        st.error("Correo inválido: debe contener '@' y '.'")
+                    elif '-' not in rut:
+                        st.error("RUT inválido: debe incluir un guion antes del dígito verificador (ej. 12345678-K)")
+                    else:
+                        try:
+                            cur = conn.cursor()
+                            cur.execute("INSERT INTO clientes (nombre, rut, correo, telefono) VALUES (?, ?, ?, ?)",
+                                       (nombre.strip(), rut.strip(), correo.strip(), telefono.strip()))
+                            conn.commit()
+                            st.success(f"¡Excelente! {nombre} ha sido registrado.")
+                            st.balloons()
+                        except sqlite3.IntegrityError:
+                            st.error("Error: Este RUT ya existe en el sistema.")
         st.markdown('</div>', unsafe_allow_html=True)
 
 def reportes_lista():
@@ -393,10 +399,15 @@ def administrar_datos():
     with st.expander("Borrar un Cliente"):
         rut_borrar = st.text_input("Ingrese RUT para eliminar")
         if st.button("Confirmar Eliminación"):
-            cur = conn.cursor()
-            cur.execute("DELETE FROM clientes WHERE rut=?", (rut_borrar,))
-            conn.commit()
-            st.success("Registro eliminado.")
+            if not rut_borrar:
+                st.warning("Ingrese un RUT para eliminar.")
+            elif '-' not in rut_borrar:
+                st.error("RUT inválido: debe incluir un guion (ej. 12345678-K)")
+            else:
+                cur = conn.cursor()
+                cur.execute("DELETE FROM clientes WHERE rut=?", (rut_borrar.strip(),))
+                conn.commit()
+                st.success("Registro eliminado.")
 
 # --- PESTAÑAS BASADAS EN ROL ---
 if st.session_state.role == "cliente":

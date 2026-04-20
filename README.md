@@ -1,6 +1,6 @@
 # Sistema de Gestión de Clientes Corporativo
 
-Aplicación web profesional para la gestión integral de clientes, con autenticación de usuarios y roles diferenciados.
+Aplicación web  para la gestión integral de clientes, con autenticación de usuarios y roles diferenciados.
 
 ## Características Principales
 
@@ -18,7 +18,7 @@ Aplicación web profesional para la gestión integral de clientes, con autentica
 
 - **Interfaz**: Streamlit (Python)
 - **Base de Datos**: SQLite
-- **Estilos**: CSS personalizado para diseño profesional
+- **Estilos**: CSS personalizado 
 - **Librerías**: Pandas para manipulación de datos
 
 ## Credenciales de Acceso
